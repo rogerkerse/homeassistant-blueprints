@@ -1,0 +1,31 @@
+blueprint:
+  name: Keep Matter/Thread Device Alive
+  description: >
+    Polls one or more entities every hour to prevent them from silently
+    disappearing from Home Assistant. Designed for IKEA Matter-over-Thread
+    bulbs that stop reporting state after extended inactivity even when
+    powered, but works for any entity that benefits from periodic re-polling.
+
+    Calls homeassistant.update_entity on a schedule, forcing HA to re-poll
+    the device and keeping it visible in the entity registry.
+  domain: automation
+  source_url: https://github.com/rogerkerse/homeassistant-blueprints/blob/main/automation/keep-alive.yaml
+  input:
+    target_entities:
+      name: Entities to keep alive
+      description: One or more entities to poll hourly.
+      selector:
+        entity:
+          multiple: true
+
+mode: single
+max_exceeded: silent
+
+triggers:
+  - trigger: time_pattern
+    hours: "/1"
+
+actions:
+  - action: homeassistant.update_entity
+    target:
+      entity_id: !input target_entities
